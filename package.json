@@ -1,5 +1,5 @@
 {
-  "name": "hannahs-zeiterfassung",
+  "name": "zeitbuch",
   "version": "1.0.0",
   "private": true,
   "engines": {
@@ -8,12 +8,13 @@
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
     "init-db": "node scripts/init-db.mjs",
-    "build": "node scripts/init-db.mjs && next build",
+    "build": "next build",
     "start": "next start --hostname 127.0.0.1"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
     "next": "16.4.6",
+    "next-auth": "5.0.0-beta.32",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

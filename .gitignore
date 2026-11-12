@@ -2,7 +2,15 @@ node_modules/
 .next/
 data/
 backups/
-.env
+.env*
+!.env.example
+*.sqlite*
+*.db
+*.db-wal
+*.db-shm
+*.pem
+*.key
+.vercel/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store

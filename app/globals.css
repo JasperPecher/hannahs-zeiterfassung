@@ -137,3 +137,15 @@ input, textarea { min-width: 0; width: 100%; padding: 9px; border: 1px solid var
   dialog { padding: 16px; }
   .time-fields input { font-size: 13px; padding: 8px 4px; }
 }
+
+.header-actions { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.header-actions .header-status { max-width: none; }
+.header-actions form { flex: none; }
+.sign-in { max-width: 430px; margin: 15px auto; padding: 22px; background: var(--white); border: 1px solid var(--line); border-radius: 13px; }
+.sign-in p { margin: 10px 0 16px; line-height: 1.5; }
+.sign-in form { display: grid; gap: 13px; margin-top: 15px; }
+.sign-in label { display: grid; gap: 5px; font-size: 14px; font-weight: 650; }
+@media (max-width: 580px) {
+  .header-actions { flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+  .header-actions .button { min-height: 26px; padding: 3px 8px; }
+}
