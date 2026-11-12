@@ -1,8 +1,0 @@
-node_modules
-.next
-data
-backups
-.env
-.env.*
-.git
-*.sqlite*

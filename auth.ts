@@ -1,7 +1,7 @@
 import { createHmac } from 'node:crypto';
 import NextAuth, { CredentialsSignin } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { database } from './lib/database';
+import { prisma } from './lib/database';
 import { isPasswordHash, verifyPassword } from './lib/password.mjs';
 
 const windowMs = 10 * 60 * 1000;
@@ -58,16 +58,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           !credentials.password || Buffer.byteLength(credentials.password) > 1024) return null;
 
       const now = Date.now();
-      const reserved = await database().execute({
-        sql: `INSERT INTO auth_attempts (id, expires_at, attempts) VALUES (1, ?, 1)
-          ON CONFLICT(id) DO UPDATE SET
-            expires_at = CASE WHEN expires_at <= ? THEN excluded.expires_at ELSE expires_at END,
-            attempts = CASE WHEN expires_at <= ? THEN 1 ELSE attempts + 1 END
-          WHERE expires_at <= ? OR attempts < ?
-          RETURNING id`,
-        args: [now + windowMs, now, now, now, attemptLimit],
-      });
-      if (!reserved.rows.length) throw new RateLimited();
+      const expiresAt = BigInt(now + windowMs);
+      const nowBig = BigInt(now);
+
+      const reserved = await prisma.$queryRaw<Array<{ id: number }>>`
+        INSERT INTO auth_attempts (id, expires_at, attempts) VALUES (1, ${expiresAt}, 1)
+        ON CONFLICT(id) DO UPDATE SET
+          expires_at = CASE WHEN auth_attempts.expires_at <= ${nowBig} THEN EXCLUDED.expires_at ELSE auth_attempts.expires_at END,
+          attempts = CASE WHEN auth_attempts.expires_at <= ${nowBig} THEN 1 ELSE auth_attempts.attempts + 1 END
+        WHERE auth_attempts.expires_at <= ${nowBig} OR auth_attempts.attempts < ${attemptLimit}
+        RETURNING id
+      `;
+      if (!reserved.length) throw new RateLimited();
 
       const correctPassword = await verifyPassword(credentials.password, owner.hash);
       if (!correctPassword || credentials.username.trim() !== owner.username) return null;
